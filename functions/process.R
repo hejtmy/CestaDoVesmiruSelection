@@ -5,3 +5,9 @@ get_browser_information <- function(df) {
                                 browser, browser_version, webaudio, width, height)
   return(browser_information)
 }
+
+results_to_df <- function(results) {
+  arr <- fromJSON(results)
+  df <- as.data.frame(fromJSON(arr[[1]]))
+  return(df)
+}

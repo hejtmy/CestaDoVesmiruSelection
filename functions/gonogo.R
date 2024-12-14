@@ -1,4 +1,6 @@
-gonogo_create_trial_table <- function(df) {
+gonogo_create_trial_table <- function(txt) {
+  arr <- fromJSON(txt)
+  df <- as.data.frame(fromJSON(arr[[1]]))
   GONOGO_IMAGE_PATH <- "https://unyavwofnmwihnpvkjji.supabase.co/storage/v1/object/public/test-stimuli/gonogo/"
   df <- filter(df, !is.na(image))
   df <- select(df, trial_index, time_elapsed, rt,
@@ -19,12 +21,11 @@ gonogo_create_trial_table <- function(df) {
   return(df)
 }
 
-
 gonogo_analyze_performance <- function(df) {
   df_out <- df %>%
     group_by(block_number, should_go) %>%
     summarise(correct = sum(correct) / n(),
               mean_rt = mean(rt, na.rm = TRUE),
-              sd_rt = sd(rt, na.rm = TRUE))
+              sd_rt = sd(rt, na.rm = TRUE), .groups = "drop")
   return(df_out)
 }
