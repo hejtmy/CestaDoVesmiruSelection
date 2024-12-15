@@ -21,3 +21,16 @@ ggplot(df_emotion, aes(performance_metric)) +
   facet_wrap(~block, scales = "free")
 
 ## NBACK -----------
+df_nback <- read.csv("processed/nback_performance.csv")
+head(df_nback)
+group_by(df_nback, block) %>%
+  summarise(mean(correct))
+
+ggplot(df_nback, aes(block, correct)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, height = 0)
+
+ggplot(df_nback, aes(correct)) +
+  geom_histogram()
+
+## SPATIAL COGNITION -----------

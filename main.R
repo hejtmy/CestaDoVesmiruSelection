@@ -48,22 +48,22 @@ dbClearResult(query)
 all <- do.call(rbind, all)
 class(all)
 save(all, file = "all.RData")
-## EMOTION
+
+
+## EMOTION ------
 txt <- all[5, ]$results
 df <- emotion_create_trial_table(txt)
 emotion_analyze_performance(df)
 
 ## NBACK
 head(all)
-arr <- fromJSON(txt)
-df <- as.data.frame(fromJSON(arr[[1]]))
+all$test_name[1:20]
 
-df <- select(df, trial_index, time_elapsed, rt,
-             response, block_number, image)
+txt <- all[15, ]$results
+nback_create_trial_table(txt)
 
 ## Spatial
 txt <- all[4, ]$results
 arr <- fromJSON(txt)
 df <- as.data.frame(fromJSON(arr[[1]]))
 View(df)
-

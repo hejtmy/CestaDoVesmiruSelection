@@ -36,10 +36,10 @@ for (i in seq_len(nrow(df_emotion))) {
 }
 write.csv(df_emotion_perf, "processed/emotion_performance.csv")
 
-df_
 # NBACK ------------
 df_nback <- filter(all, test_name == "n-back")
 df_nback_perf <- data.frame()
+validate_order <- which(nback_create_trial_table(df_nback[1, ]$results)$is_target)
 for (i in seq_len(nrow(df_nback))) {
   message("Processing participant ", df_nback[i, ]$user_id)
   txt <- df_nback[i, ]$results
@@ -48,7 +48,12 @@ for (i in seq_len(nrow(df_nback))) {
     next
   }
   df <- nback_create_trial_table(txt)
+  if (!all(which(df$is_target) == validate_order)) {
+    error("Invalid order of n-back trials")
+    stop()
+  }
   df_out <- nback_analyze_performance(df)
   df_out$participant <- df_nback[i, ]$user_id
   df_nback_perf <- rbind(df_nback_perf, df_out)
 }
+write.csv(df_nback_perf, "processed/nback_performance.csv")
