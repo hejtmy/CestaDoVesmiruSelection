@@ -7,6 +7,7 @@ spatial_analyze_performance <- function(df) {
     group_by(block) %>%
     summarise(correct = sum(correct) / n(),
               mean_rt = mean(rt),
+              performance = mean_rt/correct,
               .groups = "drop")
   return(df_out)
 }

@@ -23,9 +23,10 @@ gonogo_create_trial_table <- function(txt) {
 
 gonogo_analyze_performance <- function(df) {
   df_out <- df %>%
-    group_by(block_number, should_go) %>%
+    group_by(block = block_number) %>%
     summarise(correct = sum(correct) / n(),
-              mean_rt = mean(rt, na.rm = TRUE),
-              sd_rt = sd(rt, na.rm = TRUE), .groups = "drop")
+              mean_rt = mean(rt[should_go], na.rm = TRUE),
+              performance = mean_rt / correct,
+              .groups = "drop")
   return(df_out)
 }

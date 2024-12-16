@@ -19,7 +19,9 @@ emotion_analyze_performance <- function(df) {
               mean_rt = mean(rt),
               .groups = "drop") %>%
     rowwise() %>%
-    mutate(performance_metric = ifelse(block == "quick", correct, mean_rt/correct)) %>%
+    # We are making the performance metric to be the inverse of the correct
+    # so that lower values are always better (mean RT is better lower)
+    mutate(performance = ifelse(block == "quick", 1-correct, mean_rt/correct)) %>%
     ungroup()
   return(df_out)
 }

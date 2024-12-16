@@ -1,5 +1,8 @@
 library(dplyr)
 source("functions/gonogo.R")
+source("functions/emotion-recognition.R")
+source("functions/n-back.R")
+source("functions/spatial-cognition.R")
 load(file = "all.RData")
 
 # GONOGO ------------
