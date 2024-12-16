@@ -40,6 +40,7 @@ write.csv(df_emotion_perf, "processed/emotion_performance.csv")
 df_nback <- filter(all, test_name == "n-back")
 df_nback_perf <- data.frame()
 validate_order <- which(nback_create_trial_table(df_nback[1, ]$results)$is_target)
+
 for (i in seq_len(nrow(df_nback))) {
   message("Processing participant ", df_nback[i, ]$user_id)
   txt <- df_nback[i, ]$results
@@ -57,3 +58,21 @@ for (i in seq_len(nrow(df_nback))) {
   df_nback_perf <- rbind(df_nback_perf, df_out)
 }
 write.csv(df_nback_perf, "processed/nback_performance.csv")
+
+
+## SPATIAL COGNITION -----------
+df_spatial <- filter(all, test_name == "spatial-cognition")
+df_spatial_perf <- data.frame()
+for (i in seq_len(nrow(df_spatial))) {
+  message("Processing participant ", df_spatial[i, ]$user_id)
+  txt <- df_spatial[i, ]$results
+  if (is.na(txt)) {
+    message("Skipping participant ", df_spatial[i, ]$user_id)
+    next
+  }
+  df <- spatial_create_trial_table(txt)
+  df_out <- spatial_analyze_performance(df)
+  df_out$participant <- df_spatial[i, ]$user_id
+  df_spatial_perf <- rbind(df_spatial_perf, df_out)
+}
+write.csv(df_spatial_perf, "processed/spatial_performance.csv")

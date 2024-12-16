@@ -64,6 +64,5 @@ nback_create_trial_table(txt)
 
 ## Spatial
 txt <- all[4, ]$results
-arr <- fromJSON(txt)
-df <- as.data.frame(fromJSON(arr[[1]]))
-View(df)
+df <- results_to_df(txt)
+df_spatial <- spatial_create_trial_table(txt)
