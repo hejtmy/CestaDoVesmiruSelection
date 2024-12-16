@@ -1,11 +1,11 @@
 library(ggplot2)
+library(dplyr)
 
 # GONOGO -------------
 # Inverse Efficiency Score (IES)
-# The Inverse Efficiency Score is a commonly used method that combines speed and accuracy:
-# IES = Mean Reaction Time / (1 - Proportion of Errors)
 df_gng <- read.csv("processed/gonogo_performance.csv")
 head(df_gng)
+
 # GONOGO percentiles ----
 # lower is always better - lower RT and the performance is inversed for the long blocks
 df_gng_percentile <- df_gng %>%
@@ -19,8 +19,6 @@ df_gng_percentile <- df_gng %>%
 df_gng %>%
   filter(participant %in% df_gng_percentile$participant[is.na(df_gng_percentile$gng_percentile)])
 
-ggplot(df_gng_percentile, aes(mean_percentile)) +
-  geom_histogram(binwidth = 0.05)
 ## EMOTION ------------
 df_emotion <- read.csv("processed/emotion_performance.csv")
 head(df_emotion)
@@ -37,12 +35,10 @@ df_emotion_percentile <- df_emotion %>%
   group_by(participant) %>%
   summarise(emotion_percentile = mean(percentile), .groups = "drop")
 
-ggplot(df_emotion_percentile, aes(mean_percentile)) +
-  geom_histogram(binwidth = 0.05)
-is.na(df_emotion_percentile$emotion_percentile)
+sum(is.na(df_emotion_percentile$emotion_percentile))
+
 ## NBACK -----------
 df_nback <- read.csv("processed/nback_performance.csv")
-head(df_nback)
 
 ggplot(df_nback, aes(block, correct)) +
   geom_boxplot() +
@@ -58,8 +54,7 @@ df_nback_percentiles <- df_nback %>%
   group_by(participant) %>%
   summarise(nback_percentile = mean(percentile), .groups = "drop")
 
-ggplot(df_nback_percentiles, aes(percentile)) +
-  geom_histogram(binwidth = 0.05)
+sum(is.na(df_nback_percentiles$nback_percentile))
 
 ## SPATIAL COGNITION -----------
 df_spatial <- read.csv("processed/spatial_performance.csv")
@@ -73,20 +68,23 @@ df_spatial_percentiles <- df_spatial %>%
   group_by(participant) %>%
   summarise(spatial_percentile = mean(percentile), .groups = "drop")
 
-ggplot(df_spatial_percentiles, aes(spatial_percentile)) +
-  geom_histogram(binwidth = 0.05)
-
+sum(!is.na(df_spatial_percentiles$spatial_percentile))
 # Merge all ------
-nrow(df_gng_percentile)
-nrow(df_emotion_percentile)
-nrow(df_nback_percentiles)
-nrow(df_spatial_percentiles)
 df_all <- full_join(df_gng_percentile, df_emotion_percentile, by = "participant") %>%
-  left_join(df_nback_percentiles, by = "participant")
+  full_join(df_nback_percentiles, by = "participant") %>%
+  full_join(df_spatial_percentiles, by = "participant")
 
-nrow(df_all)
-full_join(df_nback_percentiles, by = "participant") %>%
-full_join(df_spatial_percentiles, by = "participant")
+correlation::correlation(select(df_all, -participant), method="spearman")
 
 head(df_all)
 View(df_all)
+
+## check complete data
+df_all %>%
+  filter(!complete.cases(.)) %>%
+  select(participant)
+
+df_all <- mutate(df_all, total_percentile = rowSums(select(df_all, -participant), na.rm = TRUE))
+
+ggplot(df_all, aes(total_percentile)) +
+  geom_histogram(binwidth = 0.25)
